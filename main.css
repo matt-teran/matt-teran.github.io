@@ -1,0 +1,23 @@
+body {
+	text-align: center;
+}
+.flexcontainer {
+	display: flex;
+	/*border: 1px solid black;*/
+	justify-content: center;
+	align-items: center;
+}
+.flexwrap {
+	height: 269px;
+	width: 1080px;
+	/*border: 1px solid black;*/
+	flex-wrap: wrap;
+}
+.unit {
+	border: 1px solid black;
+	height: 25px;
+	width: 25px;
+}
+.death {
+	border: none;
+}
