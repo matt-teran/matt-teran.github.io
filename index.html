@@ -4,10 +4,12 @@
 	<link rel="stylesheet" type='text/css' href='main.css'>
 	<script defer src="main.js"></script>
 	<script src="jquery.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
 	<title></title>
 </head>
 <body>
 	<h1>Snake!</h1>
+	<div class='flexwrap border'></div>
 	<div class='flexcontainer'>
 		<div class="flexwrap flexcontainer">
 			<div class='death unit'></div>
@@ -410,9 +412,19 @@
 			<div class='unit'></div>
 			<div class='unit'></div>
 			<div class='unit'></div>
-			
 		</div>
+		
 	</div>
+	<div class="flexcontainer flexbonus">
+			<div class="score">0</div>
+			<div class='easy button'>Easy</div>
+			<div class='normal button'>Normal</div>
+			<div class='hard button'>Hard</div>
+			<div>
+				<div class="difficulty">Normal</div>
+				<div class="highscore">0</div>
+			</div>
 
+	</div>
 </body>
 </html>
