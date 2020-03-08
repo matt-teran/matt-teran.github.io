@@ -39,15 +39,15 @@ $(document).ready(function(){
 
 let snakeLength = 0;
 let snakeMaxLength = 3;
-let board;
-let direction;
+let board, direction, snakeHead, foodLocation, foodTime, timeoutID, foodTimeoutID;
+// let direction;
 let memory = [];
-let snakeHead;
-let foodLocation;
-let foodTime;
+// let snakeHead;
+// let foodLocation;
+// let foodTime;
 let score = 0;
-let timeoutID;
-let foodTimeoutID;
+// let timeoutID;
+// let foodTimeoutID;
 let highscore = 0;
 let difficulty = normalDifficulty;
 
@@ -55,10 +55,10 @@ let difficulty = normalDifficulty;
 //  Element References
 // 
 const units = Array.from($('.unit').addClass());
-const scoreElement = document.querySelector('.score')
-const easy = document.querySelector('.easy')
-const normal = document.querySelector('.normal')
-const hard = document.querySelector('.hard')
+const scoreElement = document.querySelector('.score');
+const easy = document.querySelector('.easy');
+const normal = document.querySelector('.normal');
+const hard = document.querySelector('.hard');
 
 // 
 //  Event Listeners
@@ -115,8 +115,10 @@ hard.addEventListener('click', function (){
 // 
 // Functions 
 // 
-
+// if (localStorage.getItem('highscore') ){highscore = localStorage.getItem('highscore'); document.querySelector('.highscore').textContent = localStorage.getItem('highscore')}
+if (localStorage.highscore ){highscore = localStorage.highscore; document.querySelector('.highscore').textContent = localStorage.highscore}
 function init (){
+	clearTimeout(foodTimeoutID);
 	if (direction) return;
 	board = [
 	'', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 
@@ -138,35 +140,31 @@ function init (){
 
 function move (index){
 	if (!snakeHead)return;
-	if (index > 400){alert('You Lose!'); reset(); return};
-	if (index < 0){alert('You Lose!'); reset(); return};
-	if (!(index%40)){alert('You Lose!'); reset(); return};
-	if (memory.includes(index)){alert('You Lose!'); reset(); return};
-	snakeLength++;
+	if (index > 400 || index < 0 || !(index%40) || memory.includes(index)) {loss(); return};
 
-	snakeHead = index;
-	memory.push(index);
-	if (snakeHead === foodLocation){ scoreIncrease(); generateFood(); snakeMaxLength++}
+	snakeLength++;
+	memory[memory.length] = snakeHead = index;
+
+	snakeHead === foodLocation && (scoreIncrease(), generateFood(), snakeMaxLength++);
+
 	$(units[index]).addClass("snake")
-	if (snakeLength > snakeMaxLength){
-		$(units[memory[0]]).removeClass('snake');
-		snakeLength--; 
-		memory.shift()
-	};
+	snakeLength > snakeMaxLength && ($(units[memory[0]]).removeClass('snake'), snakeLength--, memory.shift());
+
 	difficulty(index);
 };
 
 function reset () {
-	if (score > highscore)document.querySelector('.highscore').textContent = score; highscore = score;
+	if (score > highscore && score > 0){document.querySelector('.highscore').textContent = score; highscore = score; localStorage.setItem('highscore', score.toString())};
+
 	units.forEach(unit => {
 		$(unit).removeClass('snake food');
 	});
+	
 	clearTimeout(foodTimeoutID);
-	score = 0;
+
+	score = snakeLength = snakeHead = 0;
 	scoreElement.textContent = `${score}`;
 	memory = [];
-	snakeLength = 0;
-	snakeHead = 0;
 	snakeMaxLength = 3;
 	direction = undefined;
 };
@@ -185,8 +183,6 @@ function easyDifficulty(index){
 		case 'right':
 			timeoutID = setTimeout(move, 200, index + 1);
 			break;
-		default:
-			break;
 	};
 };
 
@@ -203,8 +199,6 @@ function normalDifficulty(index){
 			break;
 		case 'right':
 			timeoutID = setTimeout(move, 125, index + 1);
-			break;
-		default:
 			break;
 	};
 };
@@ -223,19 +217,18 @@ function hardDifficulty(index){
 		case 'right':
 			timeoutID = setTimeout(move, 50, index + 1);
 			break;
-		default:
-			break;
 	};
 };
 
 function generateFood(){
 	$(units[foodLocation]).removeClass('food');
-	function getRandomInt(max) {
-  		foodLocation = Math.floor(Math.random() * Math.floor(max));
-	};
-	getRandomInt(400);
-	if (memory.includes(foodLocation) || !(foodLocation % 40)) {generateFood()};
+
+	setRandFoodLocation(400);
+
+	if (memory.includes(foodLocation) || !(foodLocation % 40)) generateFood();
+
 	$(units[foodLocation]).addClass('food');
+
 	foodTime = 6;
 	scoreDecay();
 };
@@ -258,12 +251,18 @@ function scoreIncrease (){
 			break;
 	}
 	clearTimeout(foodTimeoutID);
-	console.log(score);
 	scoreElement.textContent = `${score}`
 };
 
 function scoreDecay (){
-	console.log(foodTime);
 	foodTime--;
+	console.log(foodTime, score);
 	foodTimeoutID = setTimeout(scoreDecay, 1000);
+};
+function loss(){
+	alert('You Lose!');
+	reset();
+};
+function setRandFoodLocation(max) {
+  	foodLocation = Math.floor(Math.random() * Math.floor(max));
 };
